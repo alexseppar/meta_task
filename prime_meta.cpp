@@ -79,7 +79,7 @@ struct holder<N, N> {
 
 template <size_t N>
 struct N_prime_nums {
-    holder<1, N> next;
+    static holder<1, N> next;
 };
 
 template <size_t N, size_t K>
@@ -105,14 +105,13 @@ get (size_t N, holder<T, T> arg)
 
 int main ()
 {
-    N_prime_nums<100> nums;
-    auto list = nums.next;
+    auto nums = N_prime_nums<100>::next;
     sieve_t sieve;
     create_sieve (&sieve, 1300);
     Sieve_Maker (&sieve);    
     for (int i = 1; i <= 100; ++i)
     {
-        assert (get (i, list) == prime_seeker (&sieve, i));
+        assert (get (i, nums) == prime_seeker (&sieve, i));
     }
     return 0;
 }
