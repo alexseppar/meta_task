@@ -106,12 +106,10 @@ get (size_t N, holder<T, T> arg)
 int main ()
 {
     auto nums = N_prime_nums<100>::next;
-    sieve_t sieve;
-    create_sieve (&sieve, 1300);
-    Sieve_Maker (&sieve);    
+    sieve sv (1300);
     for (int i = 1; i <= 100; ++i)
     {
-        assert (get (i, nums) == prime_seeker (&sieve, i));
+        assert (get (i, nums) == sv.prime_seeker (i));
     }
     return 0;
 }

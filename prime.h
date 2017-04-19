@@ -1,16 +1,34 @@
 #ifndef PRIME_H
 #define PRIME_H
 
-typedef struct sieve_t { char * arr; size_t size;} sieve_t;
-const int   Test_Subjects[12] = {2, 3, 5, 7, 11, 13 , 17, 19, 23, 29, 31, 37};
-const int   NUM_OF_SUBJECTS = 12;
+#include <cstdlib>
+#include <algorithm>
 
-bool            prime_check     (int Num, int N);
-bool            is_prime        (sieve_t * sieve, size_t i);
-void            Sieve_Maker     (sieve_t * sieve);
-int             prime_seeker    (sieve_t * sieve, int count);
-void            create_sieve    (sieve_t * sieve, size_t memory);
-unsigned long   find_prev_prime (sieve_t *sieve, unsigned long Num);
-unsigned long   find_next_prime (sieve_t *sieve, unsigned long Num);
-bool            dtor_sieve      (sieve_t *sieve);
+class sieve final {
+    size_t size_;
+    char *memory_;
+    void make_sieve ();
+    public:
+    sieve (size_t memory) : size_(memory), memory_(new char[size_ / 16]())
+    { make_sieve (); }
+    ~sieve () { if (memory_) delete [] memory_; }
+    sieve (const sieve& that) : size_(that.size_), memory_(new char[size_ / 16]())
+    { 
+        std::copy (that.memory_, that.memory_ + size_ / 16, memory_);
+        make_sieve ();
+    }
+    sieve (sieve&& that) : size_(that.size_), memory_(that.memory_)
+    { 
+        that.memory_ = nullptr; that.size_ = 0;
+    }
+    bool operator== (const sieve& that) const
+    {
+        return (memory_ == that.memory_ && size_ == that.size_);
+    }
+    sieve& operator= (const sieve& that);
+    sieve& operator= (sieve&& that); 
+    bool is_prime (size_t num) const;
+    size_t prime_seeker (size_t num) const;
+};
+
 #endif
