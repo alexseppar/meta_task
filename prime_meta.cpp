@@ -22,6 +22,9 @@ struct Sqrt <N, S, S> {
     enum { res = S };
 };
 
+template <typename ... Args>
+struct void_t {};
+
 template <size_t N, size_t count, size_t check>
 struct is_prime_helper {
     typedef typename conditional <N % count == 0, false_type, is_prime_helper<N, count + 1, check>>::type RES;
@@ -79,37 +82,47 @@ struct holder<N, N> {
 
 template <size_t N>
 struct N_prime_nums {
-    static holder<1, N> next;
+    holder<1, N> next;
+    size_t get (size_t n);
+    size_t nums[N];
+    private:
+    void fill_nums () { fill_helper (nums, next); }
 };
 
 template <size_t N, size_t K>
-size_t
-get (size_t n, holder<N, K> arg)
+void fill_helper (size_t *nums, holder<N, K> arg)
 {
-    if (n == 1)
-    {
-        return arg.value;
-    }
-    else
-    {
-        return get (n - 1, arg.next);
-    }
+    nums[N - 1] = arg.value;
+    fill_helper (nums, arg.next);
 }
 
-template <size_t T>
-size_t
-get (size_t N, holder<T, T> arg)
+template <size_t N>
+void fill_helper (size_t *nums, holder<N, N> arg)
 {
-    return arg.value;
+    nums[N - 1] = arg.value;
+}
+
+template <size_t N>
+size_t N_prime_nums<N>::get (size_t n)
+{
+    assert (n <= N);
+    assert (n != 0);
+    static bool first_call = true;
+    if (first_call)
+    {
+        fill_nums ();
+        first_call = false;
+    }
+    return nums[n - 1];
 }
 
 int main ()
 {
-    auto nums = N_prime_nums<100>::next;
+    N_prime_nums<100> nums;
     sieve sv (1300);
     for (int i = 1; i <= 100; ++i)
     {
-        assert (get (i, nums) == sv.prime_seeker (i));
+        assert (nums.get (i) == sv.prime_seeker (i));
     }
     return 0;
 }
